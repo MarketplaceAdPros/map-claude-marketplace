@@ -1,6 +1,6 @@
 # Marketplace Ad Pros — Claude Plugins
 
-Official Claude plugins from [Marketplace Ad Pros](https://marketplaceadpros.com) for managing advertising and selling on Amazon.
+Official Claude plugins from [Marketplace Ad Pros](https://marketplaceadpros.com?ref=github-map-claude-marketplace) for managing advertising and selling on Amazon.
 
 ## Plugins
 
@@ -47,7 +47,7 @@ Each plugin bundles:
 
 ## Prerequisites
 
-A [Marketplace Ad Pros](https://marketplaceadpros.com) account with your Amazon Advertising and/or Selling Partner accounts connected. See the [integration guide](https://marketplaceadpros.com/integrations/) to get started.
+A [Marketplace Ad Pros](https://marketplaceadpros.com?ref=github-map-claude-marketplace) account with your Amazon Advertising and/or Selling Partner accounts connected. See the [integration guide](https://marketplaceadpros.com/integrations/?ref=github-map-claude-marketplace) to get started.
 
 ## License
 

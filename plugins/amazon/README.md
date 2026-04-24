@@ -1,6 +1,6 @@
 # Amazon Plugin for Claude
 
-Manage and optimize your Amazon Advertising and Selling Partner accounts through Claude using the [Marketplace Ad Pros](https://marketplaceadpros.com) MCP server.
+Manage and optimize your Amazon Advertising and Selling Partner accounts through Claude using the [Marketplace Ad Pros](https://marketplaceadpros.com?ref=github-map-claude-marketplace) MCP server.
 
 ## Skills
 
@@ -14,10 +14,10 @@ This plugin includes three skills:
 
 ## Prerequisites
 
-1. A [Marketplace Ad Pros](https://marketplaceadpros.com) account with your Amazon accounts connected.
+1. A [Marketplace Ad Pros](https://marketplaceadpros.com?ref=github-map-claude-marketplace) account with your Amazon accounts connected.
 2. This plugin auto-configures the MCP server connection via `.mcp.json`. No manual MCP setup needed.
 
-See [full integration instructions](https://marketplaceadpros.com/integrations/) for details on connecting your Amazon accounts.
+See [full integration instructions](https://marketplaceadpros.com/integrations/?ref=github-map-claude-marketplace) for details on connecting your Amazon accounts.
 
 ## Install
 
