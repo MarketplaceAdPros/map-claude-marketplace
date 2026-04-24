@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "marketplace-ad-pros": {
+      "type": "streamable-http",
+      "url": "https://app.marketplaceadpros.com/mcp"
+    }
+  }
+}
