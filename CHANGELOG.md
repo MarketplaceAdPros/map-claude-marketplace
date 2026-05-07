@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+### Amazon Plugin
+- **fba-inventory-risk-dashboard**: New skill that runs a live FBA inventory health check via the Selling Partner MCP tools and renders results as an interactive, sortable dashboard artifact with urgency tiers, headline triage, and follow-up suggestions (inbound pipeline, overstock, reorder planning)
+
 ## 1.0.0
 
 ### Amazon Plugin
