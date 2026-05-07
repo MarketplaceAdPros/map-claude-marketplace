@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+### Amazon Plugin
+- **fba-inventory-risk-dashboard**: Add the missing `assets/dashboard-template.jsx` referenced by the skill (editorial-financial React template with sortable table, urgency tiers, and run-rate sparkbars)
+
 ## 1.1.0
 
 ### Amazon Plugin
