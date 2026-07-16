@@ -1,4 +1,5 @@
 ---
+name: amazon-seller-central
 description: Guide for analyzing Amazon Seller Central and Vendor Central data. Use when working with inventory health, FBA fees, sales trends, search query performance, reorder planning, or Vendor Central metrics like vendor sales, net PPM, and demand forecasting.
 ---
 

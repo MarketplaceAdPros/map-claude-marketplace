@@ -1,4 +1,5 @@
 ---
+name: fba-inventory-risk-dashboard
 description: Run a live FBA inventory health check for an Amazon Selling Partner account and render the results as an interactive dashboard artifact. Trigger this skill whenever the user asks about FBA inventory, days of supply, stockout risk, "what's running low", "what should I reorder", inventory dashboards, or anything related to checking how their Amazon stock is holding up — even if they don't explicitly say "dashboard". Also trigger when the user wants to refresh a previously-built inventory view, or asks Claude to "run the inventory check again". Uses the Marketplace Ad Pros MCP tools (Selling Partner integrations + ask_selling_partner_report_analyst) to query live data and produces a sortable, filterable React artifact.
 ---
 
