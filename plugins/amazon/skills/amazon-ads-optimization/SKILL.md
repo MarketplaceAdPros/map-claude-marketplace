@@ -7,6 +7,8 @@ description: Amazon Advertising campaign optimization playbook and strategy guid
 
 Use this guide when optimizing Amazon Advertising campaigns. It covers the five-pillar campaign framework, bid strategy, negative keyword management, seasonal prep, and tactical fixes for common problems.
 
+> **Making changes:** `create_resources`, `update_resources`, `delete_resources` and automation-rule tools change live campaigns on Amazon. Before any write, show the user exactly what will change (resource, old → new value) and get an explicit yes.
+
 ## Evergreen Operations
 
 Things every Amazon brand should schedule or keep running.
@@ -58,8 +60,9 @@ Things every Amazon brand should schedule or keep running.
 
 ### Seasonal Playbook for Prime Events & Holidays
 
-* Identify keywords with >= 2 orders in the last 30 days
-* "Best" set: 3x budget, up to 2x bid. "Good" set: 2x budget. Rest stay normal.
+* Identify proven keywords and campaigns: orders at or under target ACoS in the last 30 days (>= 2 orders is the floor, not the definition of a winner)
+* Raise the ceiling, not the plan: "Best" set gets up to 3x budget *headroom*, "Good" set up to 2x, rest stay normal. Lift bids only on ranking/defended terms, not across the set.
+* Why headroom and not spend targets: across several hundred advertisers on Prime Day 2026, brands that raised budget 20%+ saw the same median ad-sales lift as brands that held it -- event demand fills existing budgets. Extra budget only matters where a proven campaign would otherwise cap out.
 * Choose a mode: **All-Gas**, **Profit-Only**, or **Hybrid**
 
 **Timing:** start 2 weeks before, lock budgets day-of, revert when CVR normalizes.
@@ -70,7 +73,7 @@ Higher-level pivots you pull when the business situation changes.
 
 ### Need explosive top-line growth for a surge?
 
-Go **"All Gas, No Brakes"** — triple budgets, double bids, accept higher ACoS to grab share.
+Go **"All Gas, No Brakes"** — open budget headroom widely and lift bids on ranking terms, accepting higher ACoS to grab share. Make it a deliberate choice: bigger budgets alone did not buy a bigger Prime Day 2026 lift.
 
 ### Profit is squeezed by higher fees?
 

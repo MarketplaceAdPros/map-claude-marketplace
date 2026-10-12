@@ -1,12 +1,20 @@
 {
-  "name": "amazon",
-  "version": "1.1.1",
-  "description": "Manage and optimize Amazon Advertising and Selling Partner accounts — browse campaigns, analyze performance, get optimization recommendations, and monitor inventory and sales via the Marketplace Ad Pros MCP server.",
+  "name": "marketplace-ad-pros",
+  "displayName": "Marketplace Ad Pros for Amazon",
+  "version": "2.0.0",
+  "description": "Analyze and optimize Amazon Ads, Seller Central and Vendor Central from Claude: ask about ACoS, wasted spend and sales, get bid/budget/keyword recommendations, audit listings, plan inventory, and run optimization playbooks via the Marketplace Ad Pros MCP server.",
   "author": {
-    "name": "Marketplace Ad Pros"
+    "name": "Marketplace Ad Pros",
+    "email": "support@marketplaceadpros.com",
+    "url": "https://marketplaceadpros.com"
   },
-  "homepage": "https://marketplaceadpros.com?ref=github-map-claude-marketplace",
+  "homepage": "https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/?ref=claude-plugin-directory",
   "repository": "https://github.com/MarketplaceAdPros/map-claude-marketplace",
   "license": "MIT",
-  "keywords": ["amazon", "advertising", "ppc", "campaigns", "optimization", "mcp", "seller-central", "vendor-central"]
+  "keywords": ["amazon-ads", "ppc", "acos", "seller-central", "vendor-central", "fba", "dsp", "listings", "inventory"],
+  "icon": "./assets/logo.png",
+  "documentationUrl": "https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/?ref=claude-plugin-directory",
+  "supportUrl": "https://marketplaceadpros.com/support/",
+  "privacyPolicyUrl": "https://marketplaceadpros.com/privacy-policy/",
+  "termsOfServiceUrl": "https://marketplaceadpros.com/terms-and-conditions/"
 }

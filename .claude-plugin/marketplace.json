@@ -6,21 +6,31 @@
   },
   "metadata": {
     "description": "Official Claude plugins from Marketplace Ad Pros for managing advertising and selling on Amazon",
-    "version": "1.1.1"
+    "version": "2.0.0"
   },
   "plugins": [
     {
-      "name": "amazon",
+      "name": "marketplace-ad-pros",
       "source": "./plugins/amazon",
-      "description": "Manage and optimize Amazon Advertising and Selling Partner accounts — browse campaigns, analyze performance, get optimization recommendations, and monitor inventory and sales via the Marketplace Ad Pros MCP server.",
-      "version": "1.1.1",
+      "description": "Analyze and optimize Amazon Ads, Seller Central and Vendor Central from Claude: ask about ACoS, wasted spend and sales, get bid/budget/keyword recommendations, audit listings, plan inventory, and run optimization playbooks via the Marketplace Ad Pros MCP server.",
+      "version": "2.0.0",
       "author": {
         "name": "Marketplace Ad Pros"
       },
       "homepage": "https://marketplaceadpros.com?ref=github-map-claude-marketplace",
       "repository": "https://github.com/MarketplaceAdPros/map-claude-marketplace",
       "license": "MIT",
-      "keywords": ["amazon", "advertising", "ppc", "campaigns", "optimization", "mcp", "seller-central", "vendor-central"],
+      "keywords": [
+        "amazon-ads",
+        "ppc",
+        "acos",
+        "seller-central",
+        "vendor-central",
+        "fba",
+        "dsp",
+        "listings",
+        "inventory"
+      ],
       "category": "marketing"
     }
   ]

@@ -6,7 +6,7 @@ Official Claude plugins from [Marketplace Ad Pros](https://marketplaceadpros.com
 
 | Plugin | Path | Description |
 |--------|------|-------------|
-| **Amazon** | `plugins/amazon/` | Amazon Ads management, optimization playbook, and Seller/Vendor Central insights |
+| **Marketplace Ad Pros for Amazon** (`marketplace-ad-pros`) | `plugins/amazon/` | Amazon Ads analysis and optimization, Seller/Vendor Central insights, listing audits, inventory and launch playbooks — 13 skills |
 
 ## Install
 
@@ -22,12 +22,13 @@ Official Claude plugins from [Marketplace Ad Pros](https://marketplaceadpros.com
 
 ![Add marketplace modal](img/add-marketplace-modal.png)
 
-5. The Amazon plugin and its skills will be available in your plugins list.
+5. The Marketplace Ad Pros plugin and its skills will be available in your plugins list.
 
 ### Claude Code
 
 ```bash
-claude plugin install amazon --url https://github.com/MarketplaceAdPros/map-claude-marketplace --path plugins/amazon
+/plugin marketplace add MarketplaceAdPros/map-claude-marketplace
+/plugin install marketplace-ad-pros@map-claude-marketplace
 ```
 
 ### Development / Testing
