@@ -14,7 +14,7 @@ This skill turns inventory and sales data into actionable reorder decisions: wha
 | Tool | Use for |
 |---|---|
 | `ask_selling_partner_report_analyst` | Headline workhorse. Run rate, days of supply, sell-through, vendor sales, vendor forecast — anything backed by report data. |
-| `get_selling_partner_inventory` | Live FBA inventory snapshot (fulfillable, inbound, reserved). Use for current-state quantities. **FBA only — AWD units are not in this tool or any report.** |
+| `get_selling_partner_inventory` | Live FBA inventory snapshot (fulfillable, inbound, reserved). Use for current-state quantities. **FBA only — AWD units are not in this tool; use `get_awd_inventory` (live) or the `sp_awd_inventory` report (daily history).** |
 | `get_awd_inventory` | Live AWD (Amazon Warehousing & Distribution) warehouse inventory per SKU: on-hand at AWD, inbound to AWD, and AWD→FBA transit. Call this for every FBA reorder plan — if the seller isn't onboarded to AWD the tool says so cleanly and you move on. |
 | `get_awd_replenishment_orders` | AWD→FBA replenishment order detail, including `distribution_ineligible_reasons` — why a SKU isn't flowing from AWD to FBA. Use when FBA is short but AWD shows stock. |
 | `get_selling_partner_listings` | List the user's SKUs in an account (e.g., to pin which SKUs to plan for). |

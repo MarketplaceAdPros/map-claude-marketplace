@@ -151,8 +151,9 @@ Removal/liquidation candidates are SKUs whose estimated sell-through of aged uni
 
 Freshness for this report lives at `report_freshness.sp_fba_inventory_planning.data_complete_through`.
 
-AWD warehouse inventory is NOT in this report (or any current report) — only FBA. For live AWD
-counts, call the `get_awd_inventory` tool: per-SKU AWD on-hand, inbound to AWD, and
+AWD warehouse inventory is NOT in this report — only FBA. AWD on-hand is in the `sp_awd_inventory`
+report (one row per SKU per day since 2026-08-19; for current stock take each profile's latest
+`snapshot_date`). For live AWD counts, call the `get_awd_inventory` tool: per-SKU AWD on-hand, inbound to AWD, and
 `replenishment_quantity` (AWD→FBA transit, upstream of FBA inbound — don't double-count). Add AWD
 on-hand to FBA totals for true on-hand and reorder math. If the seller isn't onboarded to AWD the
 tool says so cleanly.
