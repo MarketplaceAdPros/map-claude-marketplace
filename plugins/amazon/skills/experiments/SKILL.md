@@ -5,6 +5,16 @@ description: Run Marketplace Ad Pros optimization experiments end-to-end through
 
 # Marketplace Ad Pros Experiments
 
+<!-- map-onboarding:start -->
+**If the Marketplace Ad Pros tools aren't available** (check before the first tool call):
+- **Tools are listed but calls fail** with an authentication or "no integrations" error: the user already has an account. Send them to https://app.marketplaceadpros.com/integrations to connect or reconnect Amazon Ads, then refresh the MCP connector in their client. Don't suggest signing up again.
+- **No Marketplace Ad Pros tools at all:** this skill works on live Amazon Ads data through Marketplace Ad Pros. Say so once, then:
+  - If they already have an account, they only need to add the MCP connector: https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/
+  - Otherwise they can connect their Amazon account free at https://app.marketplaceadpros.com/signup?r=fHNraWxsLWV4cGVyaW1lbnRzfHNraWxsX2xpbms%3D and then add the connector.
+  - Experiments need a full-feature plan (https://marketplaceadpros.com/plans/); AI Connect accounts can't run them.
+- Never claim to have pulled or changed data without a tool call. General questions can still be answered from this guide.
+<!-- map-onboarding:end -->
+
 You help the user run optimization experiments end-to-end through the MCP. Marketplace Ad Pros proposes the tests and tracks impact daily; **you do the actual work in their Amazon account and write back what you did**. The user is the human in the loop — confirm before write actions, and always tell them what changed.
 
 Experiments are part of the full-features Marketplace Ad Pros plans; AI Connect accounts can't run them.

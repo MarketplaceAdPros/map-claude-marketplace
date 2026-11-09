@@ -1,7 +1,8 @@
 // Search Term Harvest Dashboard — Template
 //
-// To populate: replace BRAND, MARKETPLACE, SNAPSHOT, WINDOW, TOTAL_AD_SALES
-// constants and the RAW array with values from the analyst response.
+// To populate: replace BRAND, MARKETPLACE, SNAPSHOT, WINDOW, TOTAL_AD_SALES,
+// the source/window/currency constants and the RAW array with values from the
+// analyst response (connected) or the uploaded report (manual mode).
 //
 // RAW row schema: {
 //   term: string,         // customer search term
@@ -11,10 +12,10 @@
 //   clicks: number,       // ≥3 by filter
 //   ctr: number,          // clicks / impressions, as a decimal
 //   cost: number,         // total ad cost in account currency
-//   sales: number,        // sales14d
-//   buys: number,         // purchases14d (0 = WATCH tier)
+//   sales: number,        // attributed sales in the ATTRIBUTION window
+//   buys: number,         // attributed orders in the ATTRIBUTION window (0 = WATCH tier)
 //   acos: number | null,  // null when sales = 0
-//   cvr: number,          // purchases14d / clicks
+//   cvr: number,          // buys / clicks
 //   isNew: boolean,       // true when searchTerm ≠ keywordText (NEW reach)
 // }
 //
@@ -30,7 +31,12 @@ const BRAND = "{{ BRAND_NAME }}";              // e.g., "Example Brand Name"
 const MARKETPLACE = "{{ MARKETPLACE }}";        // e.g., "US Ads"
 const SNAPSHOT = "{{ SNAPSHOT_UTC }}";          // e.g., "2026-05-11 · 15:35 UTC"
 const WINDOW = "{{ DATE_WINDOW }}";             // e.g., "30D · 04-11 → 05-10"
-const TOTAL_AD_SALES = 0;                       // e.g., 411965.76
+const TOTAL_AD_SALES = 0;                       // e.g., 411965.76; null when no valid total exists (hides the %)
+const SOURCE_LABEL = "Live";                    // "Live" (connected) or "Uploaded report" (manual)
+const SOURCE = "sponsored_products_search_terms"; // report name (connected) or the uploaded file name(s)
+const ATTRIBUTION = "14-day";                   // attribution window of the orders/sales columns; never relabel 7-day as 14-day
+const SALES_LABEL = "ad sales";                 // "ad sales", or "ad sales in this report" when the total comes from the search term file
+const CURRENCY = "$";                           // currency symbol of the report, e.g., "€", "£"; no conversion
 
 const RAW = [
   // { term: "example product line supplement", keyword: "example product line", match: "PHRASE",
@@ -138,7 +144,7 @@ export default function SearchTermHarvestDashboard() {
   const newReachCount = useMemo(() => RAW.filter((r) => r.isNew && r.buys > 0).length, []);
   const primeCount = useMemo(() => RAW.filter((r) => tier(r).label === "PRIME").length, []);
   const watchCount = useMemo(() => RAW.filter((r) => r.buys === 0).length, []);
-  const pctOfTotal = TOTAL_AD_SALES > 0 ? (totalSales / TOTAL_AD_SALES) * 100 : 0;
+  const pctOfTotal = TOTAL_AD_SALES > 0 ? (totalSales / TOTAL_AD_SALES) * 100 : null;
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -173,10 +179,10 @@ export default function SearchTermHarvestDashboard() {
   const maxCtr = RAW.length ? Math.max(...RAW.map((r) => r.ctr)) : 1;
   const maxSales = RAW.length ? Math.max(...RAW.map((r) => r.sales)) : 1;
 
-  const fmtUSD = (n) =>
-    "$" + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  const fmtUSDcents = (n) =>
-    "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtMoney = (n) =>
+    CURRENCY + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const fmtMoneyCents = (n) =>
+    CURRENCY + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div
@@ -197,7 +203,7 @@ export default function SearchTermHarvestDashboard() {
                 color: palette.oxblood,
               }}
             >
-              ⏱ Live · {BRAND} · {MARKETPLACE}
+              ⏱ {SOURCE_LABEL} · {BRAND} · {MARKETPLACE}
             </div>
             <h1
               style={{
@@ -241,8 +247,12 @@ export default function SearchTermHarvestDashboard() {
         >
           <Stat
             label="High-intent revenue"
-            value={fmtUSD(totalSales)}
-            sub={`${pctOfTotal.toFixed(1)}% of $${(TOTAL_AD_SALES / 1000).toFixed(0)}K ad sales`}
+            value={fmtMoney(totalSales)}
+            sub={
+              pctOfTotal === null
+                ? "Share of total ad sales not available"
+                : `${pctOfTotal.toFixed(1)}% of ${CURRENCY}${(TOTAL_AD_SALES / 1000).toFixed(1)}K ${SALES_LABEL}`
+            }
           />
           <Stat
             label="New harvest opportunities"
@@ -531,7 +541,7 @@ export default function SearchTermHarvestDashboard() {
                             background: palette.rule,
                             position: "relative",
                           }}
-                          title={`${fmtUSDcents(r.sales)} of ${fmtUSDcents(maxSales)} max`}
+                          title={`${fmtMoneyCents(r.sales)} of ${fmtMoneyCents(maxSales)} max`}
                         >
                           <div
                             style={{
@@ -554,7 +564,7 @@ export default function SearchTermHarvestDashboard() {
                             textAlign: "right",
                           }}
                         >
-                          {r.sales === 0 ? "—" : fmtUSDcents(r.sales)}
+                          {r.sales === 0 ? "—" : fmtMoneyCents(r.sales)}
                         </span>
                       </div>
                     </td>
@@ -603,8 +613,8 @@ export default function SearchTermHarvestDashboard() {
               Reach
             </div>
             NEW = customer search term differs from the matched keyword text (harvesting as
-            exact = new reach). SAME = identical to keyword (harvesting tightens bid control
-            but doesn't expand reach).
+            exact can add reach, unless it's already an exact keyword elsewhere). SAME =
+            identical to keyword (harvesting tightens bid control but doesn't expand reach).
           </div>
           <div>
             <div
@@ -618,7 +628,7 @@ export default function SearchTermHarvestDashboard() {
             >
               Source
             </div>
-            sponsored_products_search_terms · 14-day attribution. Snapshot from{" "}
+            {SOURCE} · {ATTRIBUTION} attribution. Snapshot:{" "}
             <span style={{ color: palette.ink, fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>
               {SNAPSHOT}
             </span>

@@ -1,15 +1,27 @@
 ---
 name: fba-inventory-risk-dashboard
-description: Run a live FBA inventory health check that surfaces at-risk SKUs alongside product names, inbound replenishment, reserved stock, and effective days of supply (post-inbound) — rendered as an interactive dashboard artifact. Trigger whenever the user asks about FBA inventory, stockout risk, days of supply, replenishment, inbound shipments, "what's running low", "what should I reorder", or wants any inventory health view — even if they don't say "dashboard". Also trigger for aged inventory questions — age tiers, aged inventory surcharges (AIS), long-term storage fees, sell-through of old stock, Historical Days of Supply, or low-inventory-level fee risk. Prefer this over a basic at-risk view whenever inbound context, product identification, or replenishment timing might matter. Also trigger to refresh a previously-built inventory view, or to "run the inventory check again". Uses the Marketplace Ad Pros MCP tools (Selling Partner integrations + ask_selling_partner_report_analyst) to query live data.
+description: Run an FBA inventory health check that surfaces at-risk SKUs alongside product names, inbound replenishment, reserved stock, and effective days of supply (post-inbound) — rendered as an interactive dashboard artifact. Trigger whenever the user asks about FBA inventory, stockout risk, days of supply, replenishment, inbound shipments, "what's running low", "what should I reorder", or wants any inventory health view — even if they don't say "dashboard". Also trigger for aged inventory questions — age tiers, aged inventory surcharges (AIS), long-term storage fees, sell-through of old stock, Historical Days of Supply, or low-inventory-level fee risk. Prefer this over a basic at-risk view whenever inbound context, product identification, or replenishment timing might matter. Also trigger to refresh a previously-built inventory view, or to "run the inventory check again". Works live through the Marketplace Ad Pros MCP tools (ask_selling_partner_report_analyst), or on inventory and sales reports the user uploads.
 ---
 
 # FBA Inventory Risk Dashboard
 
-This skill takes the user from "how's my inventory?" to a live, interactive dashboard that shows every at-risk SKU with full pipeline context — current stock, reserved units, inbound replenishment, product names, and effective days of supply once inbound is counted.
+<!-- map-onboarding:start -->
+**Pick the mode before anything else.** This skill runs on live data through Marketplace Ad Pros (connected mode) or on reports the user uploads (manual mode):
+- **The user uploaded a report or asks to use one:** manual mode. Read `references/manual-reports.md` and follow it; it replaces steps 1–3 below and governs wherever it differs from them. This applies even when the Marketplace Ad Pros tools are available.
+- **`list_selling_partner_integrations` and `ask_selling_partner_report_analyst` are both available:** connected mode, the workflow below.
+- **Only one of them is listed, or calls fail** with an authentication or "no integrations" error: the user already has an account. Send them to https://app.marketplaceadpros.com/integrations to connect or reconnect Seller Central, then refresh the MCP connector in their client. Don't suggest signing up again. Meanwhile they can upload a report instead.
+- **No Marketplace Ad Pros tools at all:** say once that there are two ways to run this:
+  - Upload an FBA inventory report from Seller Central. If it doesn't include recent units sold, add a sales report by SKU for the last 30 days.
+  - Or connect Marketplace Ad Pros and the data is pulled for them every time. If they already have an account, they only need to add the MCP connector: https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/. Otherwise they can connect their Amazon account free at https://app.marketplaceadpros.com/signup?r=fHNraWxsLWZiYS1pbnZlbnRvcnktcmlzay1kYXNoYm9hcmR8c2tpbGxfbGluaw%3D%3D and then add the connector. Asking about their data through the MCP needs AI Connect ($10/week) or a higher plan.
+- Name the report type only, never a menu path or exact column names: those change. The console's own help covers the current steps.
+- Never claim to have pulled data without a tool call or an uploaded file.
+<!-- map-onboarding:end -->
+
+This skill takes the user from "how's my inventory?" to an interactive dashboard that shows every at-risk SKU with full pipeline context — current stock, reserved units, inbound replenishment, product names, and effective days of supply once inbound is counted.
 
 The key insight this skill encodes: **fulfillable-only DOS dramatically overstates risk**. A SKU with 2 days of fulfillable stock and 900 units inbound is not a fire. A SKU with 5 days of fulfillable stock and zero inbound is. This skill surfaces both numbers so the user can act on the real picture.
 
-## Workflow
+## Workflow (connected mode)
 
 Follow these steps in order. Don't skip the discovery steps — the analyst tool errors when account scoping is wrong.
 
@@ -84,7 +96,7 @@ To populate:
 
 1. Read `assets/dashboard-template.jsx`.
 2. Replace the `RAW` array with the enriched data rows. Each row needs: `sku`, `asin`, `name`, `pack`, `fulfillable`, `reserved`, `inbound`, `daily`, `dos`, `fullTitle`. Use raw numbers from the `data` field of the analyst responses, not the rounded display values from the answer text — those are formatted for humans and may have lost precision.
-3. Replace the masthead values: `BRAND` (from the account's `brand` or `account_name` field), `MARKETPLACE` (from `country_code` formatted as "US Marketplace" etc.), `SNAPSHOT` (from `report_freshness.sp_fba_inventory.data_complete_through`, formatted as "YYYY-MM-DD · HH:MM UTC"), and `WINDOW` (the trailing-30-day window, e.g., "30D · 04-11 → 05-11").
+3. Replace the masthead values: `BRAND` (from the account's `brand` or `account_name` field), `MARKETPLACE` (from `country_code` formatted as "US Marketplace" etc.), `SNAPSHOT` (from `report_freshness.sp_fba_inventory.data_complete_through`, formatted as "YYYY-MM-DD · HH:MM UTC"), and `WINDOW` (the trailing-30-day window, e.g., "30D · 04-11 → 05-11"). Leave the source constants at their connected values: `SOURCE_LABEL = "Live"`, `SOURCE = "sp_fba_inventory · sp_listings · sp_orders"`, `RATE_DAYS = 30`, `INBOUND_KNOWN = true`.
 4. Do not modify the styling, palette, fonts, or layout — those are part of the skill's design language. The aesthetic is editorial-financial: warm cream background, Instrument Serif display, Geist Mono for data, oxblood/amber/olive/forest urgency tiers. Generic-looking tables defeat the purpose of building this as a skill.
 
 The template's effective-DOS computation, tiering (CRITICAL/HIGH/ELEVATED/SECURED), reserved-anomaly highlighting, and DOS-shift caption ("X.Xd w/o inbound" struck-through) are all handled by the template — no extra work needed beyond populating RAW correctly.
@@ -110,7 +122,7 @@ If the user asks for a different cut, adapt the at-risk query while keeping the 
 
 **Wider net (DOS < 30 instead of < 14):** Useful for medium-term planning. Update the at-risk query's threshold and update the "Stock > 0 · DOS < 14d" subtitle in the masthead.
 
-## Aged inventory & surcharge exposure (sp_fba_inventory_planning)
+## Aged inventory & surcharge exposure (sp_fba_inventory_planning, connected mode)
 
 When the user asks about aged inventory, inventory age tiers, aged inventory surcharges (AIS),
 long-term storage fees, Historical Days of Supply, or low-inventory-level fees, the analyst has a
@@ -160,9 +172,9 @@ tool says so cleanly.
 
 ## Caveats to always surface
 
-The data has known limitations:
+The data has known limitations. In manual mode, `references/manual-reports.md` says which of these change (the data is as of the report date):
 
-- Snapshot is typically 3–4 hours stale (Amazon SP-API report cadence).
+- Connected mode: the snapshot is typically 3–4 hours stale (Amazon SP-API report cadence).
 - Fulfillable and inbound quantities are FBA only. MFN inventory is not included — use `get_selling_partner_listings` if the user needs the merchant-fulfilled side.
 - Inbound assumes on-time arrival. If shipments sit in receiving at FCs for days, the "effective DOS" overstates real coverage.
 - "Average daily units" is the 30-day mean. For SKUs with spiky demand (Prime Day items, gifting categories near holidays) this understates real near-term risk.

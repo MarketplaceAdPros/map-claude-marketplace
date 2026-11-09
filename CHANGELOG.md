@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.0
+
+- **Upload a report or connect.** Ten skills now open with a short section that picks the mode: connected
+  (Marketplace Ad Pros tools available, as before), a report the user uploads, or a reconnect prompt when the
+  tools are listed but failing. Each manual skill gets `references/manual-reports.md`, loaded only for an upload.
+  - Full analysis from an upload: `wasted-ad-spend-dashboard`, `search-term-harvest-dashboard`,
+    `fba-inventory-risk-dashboard`. The dashboard templates take source, attribution window, currency and run rate
+    from constants, so an uploaded 7-day or EUR report is labelled as such.
+  - Part of the skill from an upload: `amazon-ads-optimization`, `amazon-seller-central`, `amazon-title-optimizer`,
+    `amazon-reorder-planning`, `amazon-holiday-events`, `amazon-listing-audit`, `amazon-product-launch`. Each says
+    which part works from files and which needs the connection.
+  - `amazon-ads`, `amazon-dsp`, `experiments`: a pointer for users who aren't connected yet.
+- `amazon-dsp`, `amazon-ads`: DSP can be a self-service seat on a seller/vendor profile, not only an agency profile.
+- `fba-inventory-risk-dashboard`: the footer no longer says planned (working) shipments count as inbound.
+
 ## 2.0.0
 
 **Breaking: the plugin is renamed from `amazon` to `marketplace-ad-pros`.** Skills are now invoked as

@@ -5,6 +5,19 @@ description: Guide for rewriting Amazon product titles to fit Amazon's 75-charac
 
 # Amazon Title Optimizer Skill
 
+<!-- map-onboarding:start -->
+**Pick the mode before anything else.** Part of this skill works on reports the user uploads (manual mode); the rest needs live data through Marketplace Ad Pros (connected mode).
+- **Works from an upload:** finding and ranking long titles from a listings report, and writing the new ≤75-character titles and Item Highlights (using a Search Query Performance report if they have one), which the user then applies in Seller Central. **Needs the connection:** review themes, the catalog's structured attributes and product-type schema, and writing and verifying the change.
+- **The user uploaded a report or asks to use one:** manual mode. Read `references/manual-reports.md` and follow it; it governs wherever it differs from the tool steps below, even when the Marketplace Ad Pros tools are available. For a part that needs the connection, say so in one line and offer the manual alternative that page names.
+- **`ask_selling_partner_report_analyst` and `update_listing` available:** connected mode, the guide below.
+- **Tools listed but failing** with an authentication or "no integrations" error: the user already has an account. Send them to https://app.marketplaceadpros.com/integrations to connect or reconnect Seller Central, then refresh the MCP connector in their client. Don't suggest signing up again. Meanwhile the upload path still works for the parts above.
+- **No Marketplace Ad Pros tools at all:** say once that there are two ways to run this:
+  - Upload a listings report (and a Search Query Performance report if they have Brand Analytics), and I'll write new titles for them to apply.
+  - Or connect Marketplace Ad Pros for the full skill, with the data pulled for them every time. If they already have an account, they only need to add the MCP connector: https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/. Otherwise they can connect their Amazon account free at https://app.marketplaceadpros.com/signup?r=fHNraWxsLWFtYXpvbi10aXRsZS1vcHRpbWl6ZXJ8c2tpbGxfbGluaw%3D%3D and then add the connector. Asking about their data through the MCP needs AI Connect ($10/week) or a higher plan.
+- Name the report type only, never a menu path or exact column names: those change. The console's own help covers the current steps.
+- Never claim to have pulled data or made a change without a tool call or an uploaded file.
+<!-- map-onboarding:end -->
+
 Amazon is moving every title to a **75-character limit**. If the seller doesn't shorten their own titles, Amazon's AI does it for them — and it optimizes for brevity, not for sales. It strips the things that actually convert:
 
 - "Made in USA"
@@ -83,7 +96,7 @@ Tightening tactics that buy characters without losing meaning:
 - **Bullets, product description, and backend search terms.** These remain where cut keywords go to stay **indexed for search**. The Item Highlight is for on-page display, not a substitute for backend indexing — relocate the dropped keywords here too.
 
 ### Step 4 — Update the listing (with confirmation)
-Present the final title — and, if you trimmed a strong benefit phrase, a proposed **Item Highlight** — get explicit user sign-off, then call `update_listing` once: patch `item_name` and pass `item_highlights` in the same call. Remind the user:
+Present the final title — and, if you trimmed a strong benefit phrase, a proposed **Item Highlight** — get explicit user sign-off, then call `update_listing` twice: first patch `item_name` on its own, then pass `item_highlights` in a separate call. Amazon checks a highlight against its stored catalog title, so sending both together can fail with error 8541 even when the new title alone is accepted (see knowledge entry `mechanics/listing-catalog-conflicts`). Remind the user:
 - `"ACCEPTED"` means *queued*, not approved — Amazon may still reject or take hours to propagate, and title changes can require review.
 - `update_listing` checks your attributes against the product type schema before submitting: `validation_mode` defaults to `advisory` (submits and returns any `validation_warnings`); use `strict` to have it reject up front instead of creating a failed submission.
 - Re-pull the listing afterward to confirm it took.

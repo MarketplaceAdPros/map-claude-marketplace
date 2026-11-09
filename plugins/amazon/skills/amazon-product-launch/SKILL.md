@@ -5,6 +5,19 @@ description: Amazon new-product launch playbook for the semantic-discovery era. 
 
 # Amazon Product Launch Guide
 
+<!-- map-onboarding:start -->
+**Pick the mode before anything else.** Part of this skill works on reports the user uploads (manual mode); the rest needs live data through Marketplace Ad Pros (connected mode).
+- **Works from an upload:** the launch method, and the demand research from a Search Query Performance report for their own related ASINs (and a search term report for an existing product's ads), with the PDP and campaign plan built by the user. **Needs the connection:** category, competitive and review research through the tools, Share of Voice tracking, and every write.
+- **The user uploaded a report or asks to use one:** manual mode. Read `references/manual-reports.md` and follow it; it governs wherever it differs from the tool steps below, even when the Marketplace Ad Pros tools are available. For a part that needs the connection, say so in one line and offer the manual alternative that page names.
+- **`ask_selling_partner_report_analyst` available:** connected mode, the guide below.
+- **Tools listed but failing** with an authentication or "no integrations" error: the user already has an account. Send them to https://app.marketplaceadpros.com/integrations to connect or reconnect Seller Central, then refresh the MCP connector in their client. Don't suggest signing up again. Meanwhile the upload path still works for the parts above.
+- **No Marketplace Ad Pros tools at all:** say once that there are two ways to run this:
+  - Upload a Search Query Performance report for their own brand or a related ASIN they already sell, and I'll run the research steps it supports.
+  - Or connect Marketplace Ad Pros for the full skill, with the data pulled for them every time. If they already have an account, they only need to add the MCP connector: https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/. Otherwise they can connect their Amazon account free at https://app.marketplaceadpros.com/signup?r=fHNraWxsLWFtYXpvbi1wcm9kdWN0LWxhdW5jaHxza2lsbF9saW5r and then add the connector. Asking about their data through the MCP needs AI Connect ($10/week) or a higher plan.
+- Name the report type only, never a menu path or exact column names: those change. The console's own help covers the current steps.
+- Never claim to have pulled data or made a change without a tool call or an uploaded file.
+<!-- map-onboarding:end -->
+
 Use this guide to launch a new product on Amazon so organic rank **sticks** instead of fading when the ad push eases. It covers the semantic-discovery model, a research-first sequence, and how to build the listing and campaigns off that research using the Marketplace Ad Pros MCP tools.
 
 **Before you start:**
@@ -50,6 +63,8 @@ The PDP is what teaches Amazon the neighborhood. Give it structured evidence in 
 * **Proof** — claims, certifications, ratings, and imagery that make the fit credible.
 
 **Build / audit with:** `audit_listings` (Alexa for Shopping bullets, formatting, prohibited-content, long-title checks), `run_product_image_analysis` (does imagery carry fit + proof, not just facts), and `update_listing` / `update_listing_images` to push copy and creative. Lead the title and bullets with the top praised need-states; address the top complaints directly.
+
+**Launching in several EU marketplaces?** Copy is per marketplace, but images are not: Amazon shares listing images across a seller's EU marketplaces, so `update_listing_images` through one may replace them in all of them. Use one image set that works in every language; country-specific images can only be set in Seller Central (Country-Specific Upload).
 
 For deeper listing work, hand off to the **Amazon Listing Audit** and **Amazon Title Optimizer** skills.
 

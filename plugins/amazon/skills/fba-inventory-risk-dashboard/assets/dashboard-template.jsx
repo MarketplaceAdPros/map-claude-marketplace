@@ -1,7 +1,8 @@
 // FBA Inventory Risk Dashboard — Template
 //
-// To populate: replace the RAW array, BRAND, MARKETPLACE, SNAPSHOT, and WINDOW
-// values with the actual data from the analyst responses.
+// To populate: replace the RAW array, BRAND, MARKETPLACE, SNAPSHOT, WINDOW and
+// the source/run-rate/inbound constants with the actual data from the analyst
+// responses (connected) or the uploaded reports (manual mode).
 //
 // RAW row schema: {
 //   sku: string,            // seller SKU
@@ -10,8 +11,8 @@
 //   pack: string,           // pack indicator e.g. "2 Pack", "60 Capsules"
 //   fulfillable: number,    // afn-fulfillable-quantity
 //   reserved: number,       // afn-reserved-quantity
-//   inbound: number,        // shipped + receiving (NOT working — unshipped plans are not supply)
-//   daily: number,          // avg daily units sold over trailing 30d
+//   inbound: number,        // shipped + receiving (NOT working — unshipped plans are not supply); 0 when INBOUND_KNOWN is false
+//   daily: number,          // avg daily units sold over the trailing RATE_DAYS
 //   dos: number,            // fulfillable / daily (fulfillable-only DOS)
 //   fullTitle: string,      // full Amazon listing title (used as hover tooltip)
 // }
@@ -27,6 +28,10 @@ const BRAND = "{{ BRAND_NAME }}";              // e.g., "Example Brand Name"
 const MARKETPLACE = "{{ MARKETPLACE }}";        // e.g., "US Marketplace"
 const SNAPSHOT = "{{ SNAPSHOT_UTC }}";          // e.g., "2026-05-07 · 14:48 UTC"
 const WINDOW = "{{ DATE_WINDOW }}";             // e.g., "30D · 04-07 → 05-07"
+const SOURCE_LABEL = "Live";                    // "Live" (connected) or "Uploaded report" (manual)
+const SOURCE = "sp_fba_inventory · sp_listings · sp_orders"; // report names (connected) or the uploaded file name(s)
+const RATE_DAYS = 30;                           // days of sales behind the run rate (e.g., 30, or 14 for a 14-day sales export)
+const INBOUND_KNOWN = true;                     // false when the report has no shipped/receiving inbound split; DOS then uses fulfillable only
 
 const RAW = [
   // {
@@ -58,7 +63,7 @@ const palette = {
 };
 
 // Effective DOS factors in inbound stock arriving from suppliers.
-const eff = (r) => (r.fulfillable + r.inbound) / r.daily;
+const eff = (r) => (INBOUND_KNOWN ? r.fulfillable + r.inbound : r.fulfillable) / r.daily;
 
 function tier(effDos) {
   if (effDos < 2) return { label: "CRITICAL", color: palette.oxblood };
@@ -120,6 +125,7 @@ export default function InventoryRiskDashboard() {
   const highCount = useMemo(() => RAW.filter((r) => eff(r) >= 2 && eff(r) < 7).length, []);
   const securedCount = useMemo(() => RAW.filter((r) => eff(r) >= 14).length, []);
   const totalInbound = useMemo(() => RAW.reduce((s, r) => s + r.inbound, 0), []);
+  const dosBasis = INBOUND_KNOWN ? "Effective DOS, post-inbound" : "Fulfillable DOS · inbound not in report";
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -159,7 +165,7 @@ export default function InventoryRiskDashboard() {
               className="text-xs uppercase mb-3"
               style={{ fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", letterSpacing: "0.24em", color: palette.oxblood }}
             >
-              ⏱ Live · {BRAND} · {MARKETPLACE}
+              ⏱ {SOURCE_LABEL} · {BRAND} · {MARKETPLACE}
             </div>
             <h1
               style={{
@@ -173,8 +179,10 @@ export default function InventoryRiskDashboard() {
               FBA Inventory <em style={{ color: palette.oxblood }}>at risk</em>
             </h1>
             <p className="mt-3 max-w-xl" style={{ color: palette.mute, fontSize: "14px", lineHeight: 1.55 }}>
-              SKUs with stock on hand but fewer than 14 days of supply at trailing 30-day run rate.
-              Tiered by effective DOS — inbound replenishment factored in.
+              SKUs with stock on hand but fewer than 14 days of supply at trailing {RATE_DAYS}-day run rate.{" "}
+              {INBOUND_KNOWN
+                ? "Tiered by effective DOS — inbound replenishment factored in."
+                : "Inbound isn't in this report, so tiers use fulfillable stock only."}
             </p>
           </div>
           <div
@@ -193,9 +201,13 @@ export default function InventoryRiskDashboard() {
           style={{ background: palette.paper, border: `1px solid ${palette.rule}` }}
         >
           <Stat label="At-risk SKUs" value={RAW.length} sub="Stock > 0 · DOS < 14d" />
-          <Stat label="Critical · <2 days" value={criticalCount} sub="Effective DOS, post-inbound" />
-          <Stat label="High · 2–7 days" value={highCount} sub="Effective DOS, post-inbound" />
-          <Stat label="Secured by inbound" value={securedCount} sub={`${totalInbound.toLocaleString()} units en route`} />
+          <Stat label="Critical · <2 days" value={criticalCount} sub={dosBasis} />
+          <Stat label="High · 2–7 days" value={highCount} sub={dosBasis} />
+          {INBOUND_KNOWN ? (
+            <Stat label="Secured by inbound" value={securedCount} sub={`${totalInbound.toLocaleString()} units en route`} />
+          ) : (
+            <Stat label="Inbound" value="—" sub="Not in this report" />
+          )}
         </section>
 
         <div className="flex items-center gap-3 mb-4">
@@ -248,10 +260,10 @@ export default function InventoryRiskDashboard() {
                   <SortHeader label="Inbound" active={sort.key === "inbound"} dir={sort.dir} onClick={() => setSortKey("inbound")} align="right" />
                 </th>
                 <th className="px-4 py-3 text-right">
-                  <SortHeader label="Avg/day · 30d" active={sort.key === "daily"} dir={sort.dir} onClick={() => setSortKey("daily")} align="right" />
+                  <SortHeader label={`Avg/day · ${RATE_DAYS}d`} active={sort.key === "daily"} dir={sort.dir} onClick={() => setSortKey("daily")} align="right" />
                 </th>
                 <th className="px-4 py-3 text-right">
-                  <SortHeader label="DOS · effective" active={sort.key === "effectiveDos"} dir={sort.dir} onClick={() => setSortKey("effectiveDos")} align="right" />
+                  <SortHeader label={INBOUND_KNOWN ? "DOS · effective" : "DOS · fulfillable"} active={sort.key === "effectiveDos"} dir={sort.dir} onClick={() => setSortKey("effectiveDos")} align="right" />
                 </th>
               </tr>
             </thead>
@@ -343,20 +355,27 @@ export default function InventoryRiskDashboard() {
             <div className="uppercase mb-1.5" style={{ fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", fontSize: "10px", letterSpacing: "0.16em", color: palette.ink }}>
               Methodology
             </div>
-            Effective DOS = (fulfillable + inbound) ÷ avg daily units (30d). Inbound = working + shipped + receiving. Tiering uses effective DOS. Sales window:&nbsp;
+            {INBOUND_KNOWN
+              ? `Effective DOS = (fulfillable + inbound) ÷ avg daily units (${RATE_DAYS}d). Inbound = shipped + receiving; planned (working) shipments are not counted. Tiering uses effective DOS.`
+              : `DOS = fulfillable ÷ avg daily units (${RATE_DAYS}d). Inbound is not in this report, so tiering uses fulfillable stock only.`}{" "}
+            Sales window:&nbsp;
             <span style={{ color: palette.ink, fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>{WINDOW}</span>.
           </div>
           <div>
             <div className="uppercase mb-1.5" style={{ fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", fontSize: "10px", letterSpacing: "0.16em", color: palette.ink }}>
               Caveats
             </div>
-            Reserved units are shown but not subtracted from fulfillable. Inbound assumes on-time arrival — receiving delays at FCs will erode coverage. MFN inventory is not included.
+            Reserved units are shown but not subtracted from fulfillable.{" "}
+            {INBOUND_KNOWN
+              ? "Inbound assumes on-time arrival — receiving delays at FCs will erode coverage."
+              : "Stock already on the way isn't counted, so some SKUs may be better covered than shown."}{" "}
+            MFN inventory is not included.
           </div>
           <div>
             <div className="uppercase mb-1.5" style={{ fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", fontSize: "10px", letterSpacing: "0.16em", color: palette.ink }}>
               Source
             </div>
-            sp_fba_inventory · sp_listings · sp_orders · 30-day trailing window. Snapshot from {SNAPSHOT}.
+            {SOURCE} · {RATE_DAYS}-day trailing window. Snapshot: {SNAPSHOT}.
           </div>
         </footer>
       </div>

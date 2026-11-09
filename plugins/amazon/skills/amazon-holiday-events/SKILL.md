@@ -5,6 +5,19 @@ description: Playbook for Amazon sales events — Prime Day, Prime Big Deal Days
 
 # Amazon Seasonal & Holiday Events
 
+<!-- map-onboarding:start -->
+**Pick the mode before anything else.** Part of this skill works on reports the user uploads (manual mode); the rest needs live data through Marketplace Ad Pros (connected mode).
+- **Works from an upload:** the prep countdown (no data needed) and the post-event review from daily campaign reports and a Business Report by date covering the event and baseline days. **Needs the connection:** scheduled rules and campaign changes, inventory and listing work through the tools, DSP results, and account history (what was new for the event).
+- **The user uploaded a report or asks to use one:** manual mode. Read `references/manual-reports.md` and follow it; it governs wherever it differs from the tool steps below, even when the Marketplace Ad Pros tools are available. For a part that needs the connection, say so in one line and offer the manual alternative that page names.
+- **`ask_report_analyst` available:** connected mode, the guide below.
+- **Tools listed but failing** with an authentication or "no integrations" error: the user already has an account. Send them to https://app.marketplaceadpros.com/integrations to connect or reconnect Amazon Ads (and Seller Central for total sales), then refresh the MCP connector in their client. Don't suggest signing up again. Meanwhile the upload path still works for the parts above.
+- **No Marketplace Ad Pros tools at all:** say once that there are two ways to run this:
+  - For a post-event review, upload daily campaign reports for each ad type they ran and a Business Report by date covering the event and the baseline weeks.
+  - Or connect Marketplace Ad Pros for the full skill, with the data pulled for them every time. If they already have an account, they only need to add the MCP connector: https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/. Otherwise they can connect their Amazon account free at https://app.marketplaceadpros.com/signup?r=fHNraWxsLWFtYXpvbi1ob2xpZGF5LWV2ZW50c3xza2lsbF9saW5r and then add the connector. Asking about their data through the MCP needs AI Connect ($10/week) or a higher plan.
+- Name the report type only, never a menu path or exact column names: those change. The console's own help covers the current steps.
+- Never claim to have pulled data or made a change without a tool call or an uploaded file.
+<!-- map-onboarding:end -->
+
 Use this to prepare for, run, and measure a major Amazon sales event — **Prime Day, Prime Big Deal Days,
 Black Friday / Cyber Monday, or the holiday season** — through the Marketplace Ad Pros MCP tools.
 

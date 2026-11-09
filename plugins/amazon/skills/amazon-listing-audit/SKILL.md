@@ -5,6 +5,19 @@ description: Guide for auditing Amazon Seller Central and Vendor Central listing
 
 # Amazon Listing Audit Skill
 
+<!-- map-onboarding:start -->
+**Pick the mode before anything else.** Part of this skill works on reports the user uploads (manual mode); the rest needs live data through Marketplace Ad Pros (connected mode).
+- **Works from an upload:** content checks on listing text the user pastes or exports (conversion quality for Alexa for Shopping, banned claims, title length, formatting, and backend search terms if they provide them). **Needs the connection:** Amazon's own issue flags, suppression status, hijacking detection, product-type and variation checks, change history, catalog-wide sweeps, and any write.
+- **The user uploaded a report or asks to use one:** manual mode. Read `references/manual-reports.md` and follow it; it governs wherever it differs from the tool steps below, even when the Marketplace Ad Pros tools are available. For a part that needs the connection, say so in one line and offer the manual alternative that page names.
+- **`audit_listings` available:** connected mode, the guide below.
+- **Tools listed but failing** with an authentication or "no integrations" error: the user already has an account. Send them to https://app.marketplaceadpros.com/integrations to connect or reconnect Seller Central, then refresh the MCP connector in their client. Don't suggest signing up again. Meanwhile the upload path still works for the parts above.
+- **No Marketplace Ad Pros tools at all:** say once that there are two ways to run this:
+  - Paste a listing's title, bullets and description (or upload a listings export), and I'll check the content.
+  - Or connect Marketplace Ad Pros for the full skill, with the data pulled for them every time. If they already have an account, they only need to add the MCP connector: https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/. Otherwise they can connect their Amazon account free at https://app.marketplaceadpros.com/signup?r=fHNraWxsLWFtYXpvbi1saXN0aW5nLWF1ZGl0fHNraWxsX2xpbms%3D and then add the connector. Asking about their data through the MCP needs AI Connect ($10/week) or a higher plan.
+- Name the report type only, never a menu path or exact column names: those change. The console's own help covers the current steps.
+- Never claim to have pulled data or made a change without a tool call or an uploaded file.
+<!-- map-onboarding:end -->
+
 This skill teaches Claude how to use our MCP listing tools to audit Amazon catalog health — Alexa for Shopping scoring, hijacking detection, banned claims, suppression risk, structural problems, and the cross-cutting "ads + listing" workflows that catch wasted ad spend on broken pages.
 
 ## Tools

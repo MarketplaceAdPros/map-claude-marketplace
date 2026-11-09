@@ -1,15 +1,15 @@
 // Wasted Ad Spend Dashboard — Template
 //
-// To populate: replace BRAND, MARKETPLACE, SNAPSHOT, WINDOW, TOTAL_WASTED,
-// TOTAL_SPEND, WORST_TERM constants and the RAW array with values from the
-// analyst response.
+// To populate: replace the constants and the RAW array below. Connected mode
+// fills them from the analyst responses (SKILL.md step 5); manual mode fills
+// them from the uploaded report (references/manual-reports.md).
 //
 // RAW row schema: {
 //   term: string,        // customer search term
 //   campaign: string,    // top_campaign from analyst
 //   impressions: number, // total impressions across matches
 //   clicks: number,      // total clicks (≥5 by filter)
-//   cost: number,        // total ad cost in account currency (no rounding)
+//   cost: number,        // total ad cost in the report's currency (no rounding)
 //   ctr: number,         // clicks / impressions, as a decimal
 //   cpc: number,         // cost / clicks
 //   matches: string[],   // distinct match types: any of "EXACT","PHRASE","BROAD"
@@ -27,8 +27,14 @@ const MARKETPLACE = "{{ MARKETPLACE }}";        // e.g., "US Ads"
 const SNAPSHOT = "{{ SNAPSHOT_UTC }}";          // e.g., "2026-05-11 · 15:35 UTC"
 const WINDOW = "{{ DATE_WINDOW }}";             // e.g., "30D · 04-11 → 05-10"
 const TOTAL_WASTED = 0;                         // e.g., 5787.33
-const TOTAL_SPEND = 0;                          // e.g., 161796.77
+const TOTAL_SPEND = 0;                          // e.g., 161796.77; null when no valid total exists (hides the %)
 const WORST_TERM = "{{ WORST_TERM }}";          // e.g., "example product name gummies"
+const SOURCE_LABEL = "Live";                    // "Live" (connected) or "Uploaded report" (manual)
+const SOURCE = "sponsored_products_search_terms"; // report name (connected) or the uploaded file name(s)
+const ATTRIBUTION = "14-day";                   // attribution window of the orders column; never relabel 7-day as 14-day
+const SPEND_LABEL = "ad spend";                 // "ad spend", or "spend in this report" when the total comes from the search term file
+const CURRENCY = "$";                           // currency symbol of the report, e.g., "€", "£"; no conversion
+const TIERS = { critical: 100, high: 60 };      // cost thresholds in CURRENCY; re-anchor for other currencies or spend scales
 
 const RAW = [
   // { term: "example product name gummies", campaign: "Example Product Line (Manual)",
@@ -51,8 +57,8 @@ const palette = {
 };
 
 function tier(cost) {
-  if (cost >= 100) return { label: "CRITICAL", color: palette.oxblood };
-  if (cost >= 60) return { label: "HIGH", color: palette.amber };
+  if (cost >= TIERS.critical) return { label: "CRITICAL", color: palette.oxblood };
+  if (cost >= TIERS.high) return { label: "HIGH", color: palette.amber };
   return { label: "ELEVATED", color: palette.olive };
 }
 
@@ -136,9 +142,9 @@ export default function WastedAdSpendDashboard() {
 
   const topThirtyWasted = useMemo(() => RAW.reduce((s, r) => s + r.cost, 0), []);
   const topThirtyClicks = useMemo(() => RAW.reduce((s, r) => s + r.clicks, 0), []);
-  const criticalCount = useMemo(() => RAW.filter((r) => r.cost >= 100).length, []);
+  const criticalCount = useMemo(() => RAW.filter((r) => r.cost >= TIERS.critical).length, []);
   const longTailWasted = Math.max(0, TOTAL_WASTED - topThirtyWasted);
-  const pctOfTotal = TOTAL_SPEND > 0 ? (TOTAL_WASTED / TOTAL_SPEND) * 100 : 0;
+  const pctOfTotal = TOTAL_SPEND > 0 ? (TOTAL_WASTED / TOTAL_SPEND) * 100 : null;
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -171,8 +177,8 @@ export default function WastedAdSpendDashboard() {
   const maxCtr = RAW.length ? Math.max(...RAW.map((r) => r.ctr)) : 1;
   const maxCost = RAW.length ? Math.max(...RAW.map((r) => r.cost)) : 1;
 
-  const fmtUSD = (n) =>
-    "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtMoney = (n) =>
+    CURRENCY + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div
@@ -193,7 +199,7 @@ export default function WastedAdSpendDashboard() {
                 color: palette.oxblood,
               }}
             >
-              ⏱ Live · {BRAND} · {MARKETPLACE}
+              ⏱ {SOURCE_LABEL} · {BRAND} · {MARKETPLACE}
             </div>
             <h1
               style={{
@@ -210,7 +216,7 @@ export default function WastedAdSpendDashboard() {
               className="mt-3 max-w-xl"
               style={{ color: palette.mute, fontSize: "14px", lineHeight: 1.55 }}
             >
-              Search terms generating clicks but zero conversions in the trailing 30 days.
+              Search terms generating clicks but zero conversions in the window shown.
               Sorted by total wasted spend — biggest leaks first.
             </p>
           </div>
@@ -236,21 +242,25 @@ export default function WastedAdSpendDashboard() {
         >
           <Stat
             label="Total wasted"
-            value={fmtUSD(TOTAL_WASTED)}
-            sub={`${pctOfTotal.toFixed(2)}% of $${(TOTAL_SPEND / 1000).toFixed(1)}K ad spend`}
+            value={fmtMoney(TOTAL_WASTED)}
+            sub={
+              pctOfTotal === null
+                ? "Share of total spend not available"
+                : `${pctOfTotal.toFixed(2)}% of ${CURRENCY}${(TOTAL_SPEND / 1000).toFixed(1)}K ${SPEND_LABEL}`
+            }
           />
           <Stat
             label="Top 30 leakage"
-            value={fmtUSD(topThirtyWasted)}
+            value={fmtMoney(topThirtyWasted)}
             sub={`${TOTAL_WASTED > 0 ? ((topThirtyWasted / TOTAL_WASTED) * 100).toFixed(0) : 0}% of waste · shown below`}
           />
           <Stat
             label="Long-tail bleed"
-            value={fmtUSD(longTailWasted)}
+            value={fmtMoney(longTailWasted)}
             sub="Diffuse losses · beyond top 30"
           />
           <Stat
-            label="Critical · ≥ $100"
+            label={`Critical · ≥ ${CURRENCY}${TIERS.critical}`}
             value={criticalCount}
             sub={`Worst: ${WORST_TERM}`}
             last
@@ -365,7 +375,7 @@ export default function WastedAdSpendDashboard() {
                     style={{
                       borderBottom:
                         i === rows.length - 1 ? "none" : `1px dashed ${palette.rule}`,
-                      background: r.cost >= 100 ? "rgba(138, 28, 28, 0.04)" : "transparent",
+                      background: r.cost >= TIERS.critical ? "rgba(138, 28, 28, 0.04)" : "transparent",
                     }}
                   >
                     <td className="px-4 py-3" style={{ verticalAlign: "middle" }}>
@@ -481,7 +491,7 @@ export default function WastedAdSpendDashboard() {
                             background: palette.rule,
                             position: "relative",
                           }}
-                          title={`$${r.cost.toFixed(2)} of $${maxCost.toFixed(2)} max`}
+                          title={`${CURRENCY}${r.cost.toFixed(2)} of ${CURRENCY}${maxCost.toFixed(2)} max`}
                         >
                           <div
                             style={{
@@ -504,7 +514,7 @@ export default function WastedAdSpendDashboard() {
                             textAlign: "right",
                           }}
                         >
-                          ${r.cost.toFixed(2)}
+                          {CURRENCY}{r.cost.toFixed(2)}
                         </span>
                       </div>
                     </td>
@@ -536,7 +546,7 @@ export default function WastedAdSpendDashboard() {
             >
               Methodology
             </div>
-            Waste = clicks ≥ 5 AND purchases14d = 0. Aggregated at search-term level across all
+            Waste = clicks ≥ 5 AND zero {ATTRIBUTION} orders. Aggregated at search-term level across all
             campaigns and match types. Sales window:&nbsp;
             <span style={{ color: palette.ink, fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>
               {WINDOW}
@@ -555,7 +565,7 @@ export default function WastedAdSpendDashboard() {
             >
               Excluded
             </div>
-            Terms with fewer than 5 clicks (insufficient signal) and terms with any 14-day
+            Terms with fewer than 5 clicks (insufficient signal) and terms with any {ATTRIBUTION}{" "}
             conversions (no matter how poor the ACOS). View shows top 30 by cost; total includes
             all qualifying terms.
           </div>
@@ -571,7 +581,7 @@ export default function WastedAdSpendDashboard() {
             >
               Source
             </div>
-            sponsored_products_search_terms · 14-day attribution. Snapshot from{" "}
+            {SOURCE} · {ATTRIBUTION} attribution. Snapshot:{" "}
             <span style={{ color: palette.ink, fontFamily: "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>
               {SNAPSHOT}
             </span>

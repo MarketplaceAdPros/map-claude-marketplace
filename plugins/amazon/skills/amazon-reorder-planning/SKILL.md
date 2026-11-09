@@ -5,6 +5,19 @@ description: Guide for building reorder plans, replenishment recommendations, an
 
 # Amazon Reorder Planning Skill
 
+<!-- map-onboarding:start -->
+**Pick the mode before anything else.** Part of this skill works on reports the user uploads (manual mode); the rest needs live data through Marketplace Ad Pros (connected mode).
+- **Works from an upload:** FBA reorder math and a PO draft from an FBA inventory report plus sales by SKU, with the lead time and safety stock the user gives. **Needs the connection:** AWD stock and replenishment, Vendor Central forecasts and inventory, and coordinating reorders with ad spend.
+- **The user uploaded a report or asks to use one:** manual mode. Read `references/manual-reports.md` and follow it; it governs wherever it differs from the tool steps below, even when the Marketplace Ad Pros tools are available. For a part that needs the connection, say so in one line and offer the manual alternative that page names.
+- **`ask_selling_partner_report_analyst` and `get_selling_partner_inventory` available:** connected mode, the guide below.
+- **Tools listed but failing** with an authentication or "no integrations" error: the user already has an account. Send them to https://app.marketplaceadpros.com/integrations to connect or reconnect Seller Central, then refresh the MCP connector in their client. Don't suggest signing up again. Meanwhile the upload path still works for the parts above.
+- **No Marketplace Ad Pros tools at all:** say once that there are two ways to run this:
+  - Upload an FBA inventory report and, if it has no recent units sold, a sales report by SKU, plus their lead time; I'll work out what to reorder.
+  - Or connect Marketplace Ad Pros for the full skill, with the data pulled for them every time. If they already have an account, they only need to add the MCP connector: https://marketplaceadpros.com/amazon-ads-mcp-server-for-claude/. Otherwise they can connect their Amazon account free at https://app.marketplaceadpros.com/signup?r=fHNraWxsLWFtYXpvbi1yZW9yZGVyLXBsYW5uaW5nfHNraWxsX2xpbms%3D and then add the connector. Asking about their data through the MCP needs AI Connect ($10/week) or a higher plan.
+- Name the report type only, never a menu path or exact column names: those change. The console's own help covers the current steps.
+- Never claim to have pulled data or made a change without a tool call or an uploaded file.
+<!-- map-onboarding:end -->
+
 This skill turns inventory and sales data into actionable reorder decisions: what to buy, how much, and when. It works for both FBA (Seller Central) and Vendor Central inventory and emphasizes that reorder math depends on inputs only the user knows (lead times, target service level, cost per PO).
 
 > **About artifacts:** Reorder plans are best delivered as text or compact tables — they're decisions, not dashboards. If the user wants an interactive view of inventory state instead of a reorder decision, the FBA Inventory Risk Dashboard skill is the right tool — point them at it. See `references/dashboard-pointers.md` for context on when to suggest that skill instead of building anything yourself. Do not produce React artifacts from this skill.

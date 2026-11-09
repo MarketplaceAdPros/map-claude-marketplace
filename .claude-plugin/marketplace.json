@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Official Claude plugins from Marketplace Ad Pros for managing advertising and selling on Amazon",
-    "version": "2.0.0"
+    "version": "2.1.0"
   },
   "plugins": [
     {
       "name": "marketplace-ad-pros",
       "source": "./plugins/amazon",
       "description": "Analyze and optimize Amazon Ads, Seller Central and Vendor Central from Claude: ask about ACoS, wasted spend and sales, get bid/budget/keyword recommendations, audit listings, plan inventory, and run optimization playbooks via the Marketplace Ad Pros MCP server.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "Marketplace Ad Pros"
       },
